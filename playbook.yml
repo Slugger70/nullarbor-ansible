@@ -45,6 +45,7 @@
   - name: Install required perl modules
     cpanm: name={{ item }} notest=yes
     with_items:
+      - List::Util
       - Moo
       - Spreadsheet::Read
       - YAML::Tiny
@@ -84,6 +85,17 @@
 
   - name: Install older version of capnp
     homebrew: name=/home/ubuntu/capnp-0.5.2.rb state=present
+
+  - name: Install roary dependencies
+    homebrew: name={{ item }}
+    with_items:
+      - bedtools
+      - cd-hit
+      - mcl
+      - parallel
+      - prank
+      - mafft
+      - exonerate
 
   - name: Install nullarbor
     homebrew: name=nullarbor state=present #update_homebrew=yes
