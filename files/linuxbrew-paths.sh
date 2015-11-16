@@ -1,0 +1,5 @@
+PATH="/mnt/galaxy/other_tools/.linuxbrew/bin:$PATH"
+MANPATH="/mnt/galaxy/other_tools/.linuxbrew/share/man:$MANPATH"
+INFOPATH="/mnt/galaxy/other_tools/.linuxbrew/share/info:$INFOPATH"
+HOMEBREW_TEMP="/mnt/transient_nfs"
+HOMEBREW_CACHE="/mnt/transient_nfs"

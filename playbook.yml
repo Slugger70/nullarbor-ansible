@@ -1,0 +1,86 @@
+- hosts: my_hosts
+  environment:
+    PATH: /mnt/galaxy/other_tools/.linuxbrew/bin:{{ ansible_env.PATH }}
+    MANPATH: /mnt/galaxy/other_tools/.linuxbrew/share/man:{{ ansible_env.MANPATH }}
+    INFOPATH: /mnt/galaxy/other_tools/.linuxbrew/share/info:{{ ansible_env.INFOPATH }}
+    HOMEBREW_TEMP: /mnt/transient_nfs
+    HOMEBREW_CACHE: /mnt/transient_nfs
+  tasks:
+  - name: Update the apt cache
+    apt: update_cache=yes
+    sudo: yes
+    sudo_user: root
+
+  - name: Install some more required system packages
+    apt: pkg={{ item }} state=latest
+    with_items:
+      - build-essential
+      - curl
+      - git
+      - m4
+      - ruby
+      - texinfo
+      - libbz2-dev
+      - libcurl4-openssl-dev
+      - libexpat-dev
+      - libncurses-dev
+      - zlib1g-dev
+      - cpanminus
+      - pandoc
+    sudo: yes
+    sudo_user: root
+
+  - name: Clone linuxbrew
+    git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/.linuxbrew accept_hostkey=yes
+
+  - name: Add the brew paths to path, manpath and infopath
+    copy: src=files/linuxbrew-paths.sh dest=/etc/profile.d/linuxbrew-paths.sh owner=ubuntu
+    sudo: yes
+    sudo_user: root
+
+  # This is loaded in the environment tags..
+  #- name: Load the linuxbrew paths
+  #  shell: ". /etc/profile.d/linuxbrew-paths.sh"
+
+  - name: Install required perl modules
+    cpanm: name={{ item }} notest=yes
+    with_items:
+      - Moo
+      - Spreadsheet::Read
+      - YAML::Tiny
+      - Bio::Roary
+    sudo: yes
+    sudo_user: root
+
+  - name: Tap some kegs!
+    homebrew_tap: tap={{ item }} state=present
+    with_items:
+      - homebrew/science
+      - chapmanb/cbl
+      - tseemann/bioinformatics-linux
+
+  - name: Reinstall pkg-config - uninstall phase
+    homebrew: name=pkg-config state=absent
+
+  - name: Reinstall pkg-config - install phase
+    homebrew: name=pkg-config state=present
+
+  - name: brew install libtool
+    homebrew: name=libtool
+
+  - name: install blast+ with compile options --without-static an --without-check
+    homebrew: name=blast install_options=without-static,without-check
+
+  #- name: install imagemagick with compile options --with-librsvg and --HEAD
+  #  homebrew: name=imagemagick install_options=with-librsvg,HEAD
+
+  - name: Copy working version of capnp.rb to server
+    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/
+    sudo: yes
+    sudo_user: ubuntu
+
+  - name: Install older version of capnp
+    homebrew: name=/home/ubuntu/capnp-0.5.2.rb state=present
+
+  - name: Install nullarbor
+    homebrew: name=nullarbor state=present #update_homebrew=yes
