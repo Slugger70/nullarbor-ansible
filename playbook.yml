@@ -71,6 +71,9 @@
   - name: install blast+ with compile options --without-static an --without-check
     homebrew: name=blast install_options=without-static,without-check
 
+  - name: install skewer
+    homebrew: name=skewer state=present
+
   #- name: install imagemagick with compile options --with-librsvg and --HEAD
   #  homebrew: name=imagemagick install_options=with-librsvg,HEAD
 
