@@ -79,12 +79,12 @@
   #  homebrew: name=imagemagick install_options=with-librsvg,HEAD
 
   - name: Copy working version of capnp.rb to server
-    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/
+    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/capnp.rb
     sudo: yes
     sudo_user: ubuntu
 
   - name: Install older version of capnp
-    homebrew: name=/home/ubuntu/capnp-0.5.2.rb state=present
+    command: brew install /home/ubuntu/capnp.rb
 
   - name: Install roary dependencies
     homebrew: name={{ item }}
