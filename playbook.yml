@@ -134,7 +134,7 @@
     get_url: url="https://ccb.jhu.edu/software/kraken/dl/minikraken.tgz" dest="/mnt/transient_nfs/" mode=0755
 
   - name: Untar the kraken database
-    unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/"
+    unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb"
 
   - name: Update the prokka version
     command: brew reinstall prokka --HEAD
