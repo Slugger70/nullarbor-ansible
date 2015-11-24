@@ -13,6 +13,8 @@
     INFOPATH: "/mnt/galaxy/other_tools/linuxbrew/share/info:{{ ansible_env.INFOPATH }}"
     HOMEBREW_TEMP: "/mnt/transient_nfs"
     HOMEBREW_CACHE: "/mnt/transient_nfs"
+    TEMPDIR: "/mnt/transient_nfs"
+    TEMP: "/mnt/transient_nfs"
 
   tasks:
 
@@ -42,8 +44,8 @@
     sudo_user: root
 
   #install linuxbrew which is the method for installation of nullarbor
-  - name: Clone linuxbrew
-    git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/linuxbrew accept_hostkey=yes
+  #  - name: Clone linuxbrew
+  # git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/linuxbrew accept_hostkey=yes
 
   # copy across the .sh file to add the correct pathing to the profile.d directory so users can access the software correctly.
   - name: Add the brew paths to path, manpath and infopath
@@ -81,17 +83,17 @@
 
   #Add some modified formula files to server for later installation
   - name: Copy working formula files to machine - capnp
-    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/capnp.rb
+    copy: src=files/capnp-0.5.2.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/capnp.rb
     sudo: yes
     sudo_user: ubuntu
 
   - name: Copy working formula files to machine - imagemagick
-    copy: src=files/imagemagick.rb dest=/home/ubuntu/imagemagick.rb
+    copy: src=files/imagemagick.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/imagemagick.rb
     sudo: yes
     sudo_user: ubuntu
 
   - name: Copy working formula files to machine - libpng.rb
-    copy: src=files/libpng.rb dest=/home/ubuntu/libpng.rb
+    copy: src=files/libpng.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/libpng.rb
     sudo: yes
     sudo_user: ubuntu
 
@@ -99,9 +101,9 @@
   - name: Install libpng, imagemagick and capnp
     command: brew install {{ item }}
     with_items:
-      - /home/ubuntu/libpng.rb
-      - "/home/ubuntu/imagemagick.rb --with-librsvg"
-      - /home/ubuntu/capnp.rb
+      - libpng
+      - "imagemagick --with-librsvg"
+      - capnp
 
 
   - name: install blast+ with compile options --without-static an --without-check
@@ -130,8 +132,16 @@
     homebrew: name=nullarbor state=present
 
   #Now fix it.
+  
+  - name: Make the krakendb dir
+    file: dest=/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb owner=ubuntu group=users state=directory
+    sudo: yes
+    sudo_user: ubuntu
+
   - name: Install the kraken database
-    get_url: url="https://ccb.jhu.edu/software/kraken/dl/minikraken.tgz" dest="/mnt/transient_nfs/" mode=0755
+    get_url: url="https://ccb.jhu.edu/software/kraken/dl/minikraken.tgz" dest="/mnt/transient_nfs/minikraken.tgz" mode=0755
+    sudo: yes
+    sudo_user: ubuntu
 
   - name: Untar the kraken database
     unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb"
