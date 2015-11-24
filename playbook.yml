@@ -60,6 +60,7 @@
       - Spreadsheet::Read
       - YAML::Tiny
       - Bio::Roary
+      - https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
     sudo: yes
     sudo_user: root
 
