@@ -1,11 +1,22 @@
+#
+# An ansible script to install Torsten Seemann's Nullarbor Public Health reporting tool onto a Nectar VM running
+# the mGVL flavour.
+#
+# In the future, this script will be incorporated into the mGVL filesystem script.
+
+
 - hosts: my_hosts
+  # set some environment variables for the install
   environment:
-    PATH: /mnt/galaxy/other_tools/.linuxbrew/bin:{{ ansible_env.PATH }}
-    MANPATH: /mnt/galaxy/other_tools/.linuxbrew/share/man:{{ ansible_env.MANPATH }}
-    INFOPATH: /mnt/galaxy/other_tools/.linuxbrew/share/info:{{ ansible_env.INFOPATH }}
-    HOMEBREW_TEMP: /mnt/transient_nfs
-    HOMEBREW_CACHE: /mnt/transient_nfs
+    PATH: "/mnt/galaxy/other_tools/linuxbrew/bin:{{ ansible_env.PATH }}"
+    MANPATH: "/mnt/galaxy/other_tools/linuxbrew/share/man:{{ ansible_env.MANPATH }}"
+    INFOPATH: "/mnt/galaxy/other_tools/linuxbrew/share/info:{{ ansible_env.INFOPATH }}"
+    HOMEBREW_TEMP: "/mnt/transient_nfs"
+    HOMEBREW_CACHE: "/mnt/transient_nfs"
+
   tasks:
+
+  # Install some extra required system packages
   - name: Update the apt cache
     apt: update_cache=yes
     sudo: yes
@@ -30,18 +41,17 @@
     sudo: yes
     sudo_user: root
 
+  #install linuxbrew which is the method for installation of nullarbor
   - name: Clone linuxbrew
-    git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/.linuxbrew accept_hostkey=yes
+    git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/linuxbrew accept_hostkey=yes
 
+  # copy across the .sh file to add the correct pathing to the profile.d directory so users can access the software correctly.
   - name: Add the brew paths to path, manpath and infopath
     copy: src=files/linuxbrew-paths.sh dest=/etc/profile.d/linuxbrew-paths.sh owner=ubuntu
     sudo: yes
     sudo_user: root
 
-  # This is loaded in the environment tags..
-  #- name: Load the linuxbrew paths
-  #  shell: ". /etc/profile.d/linuxbrew-paths.sh"
-
+  #install some extra perl modules for roary and Torsten's stuff
   - name: Install required perl modules
     cpanm: name={{ item }} notest=yes
     with_items:
@@ -53,6 +63,7 @@
     sudo: yes
     sudo_user: root
 
+  #Now add the science, cbl and bioinformatics formula to the brew setup..
   - name: Tap some kegs!
     homebrew_tap: tap={{ item }} state=present
     with_items:
@@ -60,14 +71,37 @@
       - chapmanb/cbl
       - tseemann/bioinformatics-linux
 
-  - name: Reinstall pkg-config - uninstall phase
-    homebrew: name=pkg-config state=absent
-
-  - name: Reinstall pkg-config - install phase
+  #Install some required non-default brew packages
+  - name: Install pkg-config - install phase
     homebrew: name=pkg-config state=present
 
   - name: brew install libtool
     homebrew: name=libtool
+
+  #Add some modified formula files to server for later installation
+  - name: Copy working formula files to machine - capnp
+    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/capnp.rb
+    sudo: yes
+    sudo_user: ubuntu
+
+  - name: Copy working formula files to machine - imagemagick
+    copy: src=files/imagemagick.rb dest=/home/ubuntu/imagemagick.rb
+    sudo: yes
+    sudo_user: ubuntu
+
+  - name: Copy working formula files to machine - libpng.rb
+    copy: src=files/imagemagick.rb dest=/home/ubuntu/imagemagick.rb
+    sudo: yes
+    sudo_user: ubuntu
+
+  #Install the modified formulae
+  - name: Install libpng, imagemagick and capnp
+    command: brew install {{ item }}
+    with_items:
+      - /home/ubuntu/libpng.rb
+      - "/home/ubuntu/imagemagick.rb --with-librsvg"
+      - /home/ubuntu/capnp.rb
+
 
   - name: install blast+ with compile options --without-static an --without-check
     homebrew: name=blast install_options=without-static,without-check
@@ -78,14 +112,7 @@
   #- name: install imagemagick with compile options --with-librsvg and --HEAD
   #  homebrew: name=imagemagick install_options=with-librsvg,HEAD
 
-  - name: Copy working version of capnp.rb to server
-    copy: src=files/capnp-0.5.2.rb dest=/home/ubuntu/capnp.rb
-    sudo: yes
-    sudo_user: ubuntu
-
-  - name: Install older version of capnp
-    command: brew install /home/ubuntu/capnp.rb
-
+  #install all the dependencies for roary
   - name: Install roary dependencies
     homebrew: name={{ item }}
     with_items:
@@ -97,5 +124,21 @@
       - mafft
       - exonerate
 
+  #finally, install nullarbot
   - name: Install nullarbor
-    homebrew: name=nullarbor state=present #update_homebrew=yes
+    homebrew: name=nullarbor state=present
+
+  #Now fix it.
+  - name: Install the kraken database
+    get_url: url="https://ccb.jhu.edu/software/kraken/dl/minikraken.tgz" dest="/mnt/transient_nfs/" mode=0755
+
+  - name: Untar the kraken database
+    unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/"
+
+  - name: Update the prokka version
+    command: brew reinstall prokka --HEAD
+
+  - name: update the perl List::Util version
+    command: cpanm --upgrade List::Util
+    sudo: yes
+    sudo_user: ubuntu
