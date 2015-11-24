@@ -91,7 +91,7 @@
     sudo_user: ubuntu
 
   - name: Copy working formula files to machine - libpng.rb
-    copy: src=files/imagemagick.rb dest=/home/ubuntu/imagemagick.rb
+    copy: src=files/libpng.rb dest=/home/ubuntu/libpng.rb
     sudo: yes
     sudo_user: ubuntu
 
