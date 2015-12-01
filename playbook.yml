@@ -134,7 +134,7 @@
   #Now fix it.
   
   - name: Make the krakendb dir
-    file: dest=/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb owner=ubuntu group=users state=directory
+    file: dest=/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb owner=ubuntu state=directory
     sudo: yes
     sudo_user: ubuntu
 
@@ -144,7 +144,12 @@
     sudo_user: ubuntu
 
   - name: Untar the kraken database
-    unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb"
+    unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb" copy=no
+
+  - name: Move the kraken db
+    command: mv /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/minikraken*/* /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/
+    sudo: yes
+    sudo_user: ubuntu
 
   - name: Update the prokka version
     command: brew reinstall prokka --HEAD
