@@ -44,8 +44,8 @@
     sudo_user: root
 
   #install linuxbrew which is the method for installation of nullarbor
-  #  - name: Clone linuxbrew
-  # git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/linuxbrew accept_hostkey=yes
+  - name: Clone linuxbrew
+    git: repo="https://github.com/Homebrew/linuxbrew.git" dest=/mnt/galaxy/other_tools/linuxbrew accept_hostkey=yes force=yes
 
   # copy across the .sh file to add the correct pathing to the profile.d directory so users can access the software correctly.
   - name: Add the brew paths to path, manpath and infopath
@@ -82,28 +82,28 @@
     homebrew: name=libtool
 
   #Add some modified formula files to server for later installation
-  - name: Copy working formula files to machine - capnp
-    copy: src=files/capnp-0.5.2.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/capnp.rb
-    sudo: yes
-    sudo_user: ubuntu
+  #- name: Copy working formula files to machine - capnp
+  #  copy: src=files/capnp-0.5.2.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/capnp.rb
+  #  sudo: yes
+  #  sudo_user: ubuntu
 
-  - name: Copy working formula files to machine - imagemagick
-    copy: src=files/imagemagick.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/imagemagick.rb
-    sudo: yes
-    sudo_user: ubuntu
+  #- name: Copy working formula files to machine - imagemagick
+  #  copy: src=files/imagemagick.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/imagemagick.rb
+  #  sudo: yes
+  #  sudo_user: ubuntu
 
-  - name: Copy working formula files to machine - libpng.rb
-    copy: src=files/libpng.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/libpng.rb
-    sudo: yes
-    sudo_user: ubuntu
+  #- name: Copy working formula files to machine - libpng.rb
+  #  copy: src=files/libpng.rb dest=/mnt/galaxy/other_tools/linuxbrew/Library/Formula/libpng.rb
+  #  sudo: yes
+  #  sudo_user: ubuntu
 
   #Install the modified formulae
-  - name: Install libpng, imagemagick and capnp
-    command: brew install {{ item }}
-    with_items:
-      - libpng
-      - "imagemagick --with-librsvg"
-      - capnp
+  #- name: Install libpng, imagemagick and capnp
+  #  command: brew install {{ item }}
+  #  with_items:
+  #    - libpng
+  #    - "imagemagick --with-librsvg"
+  #    - capnp
 
 
   - name: install blast+ with compile options --without-static an --without-check
