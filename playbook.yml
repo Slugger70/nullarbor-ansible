@@ -86,12 +86,12 @@
     homebrew: name=libpng
 
   - name: symlink libpng pkg-config files
-    command: cd /mnt/galaxy/other_tools/linuxbrew/lib/pkgconfig && ln -s ../../Cellar/libpng/1.6.19/lib/pkgconfig/*.pc .
+    command: "cp -s /mnt/galaxy/other_tools/linuxbrew/Cellar/libpng/1.6.19/lib/pkgconfig/*.pc /mnt/galaxy/other_tools/linuxbrew/lib/pkgconfig/"
     sudo: yes
     sudo_user: ubuntu
 
   - name: symlink libpng .so files to lib
-    command: cd /mnt/galaxy/other_tools/linuxbrew/lib && ln -s ../../Cellar/libpng/1.6.19/lib/libpng* .
+    command: "cp -s /mnt/galaxy/other_tools/linuxbrew/Cellar/libpng/1.6.19/lib/libpng* /mnt/galaxy/other_tools/linuxbrew/lib/"
     sudo: yes
     sudo_user: ubuntu
 
