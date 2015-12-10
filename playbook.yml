@@ -103,7 +103,7 @@
 
   #Install the modified imagemagick formula
   - name: Install modified formula
-    command: brew install imagemagick install_options=with-librsvg
+    homebrew: name=imagemagick install_options=with-librsvg
 
   - name: install blast+ with compile options --without-static an --without-check
     homebrew: name=blast install_options=without-static,without-check
