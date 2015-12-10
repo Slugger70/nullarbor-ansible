@@ -146,7 +146,7 @@
     unarchive: src="/mnt/transient_nfs/minikraken.tgz" dest="/mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb" copy=no
 
   - name: Move the kraken db
-    command: mv /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/minikraken*/* /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/
+    shell: "mv /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/minikraken*/* /mnt/galaxy/other_tools/linuxbrew/Cellar/kraken/krakendb/"
     sudo: yes
     sudo_user: ubuntu
 
