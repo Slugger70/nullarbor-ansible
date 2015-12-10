@@ -157,3 +157,6 @@
     command: cpanm --upgrade List::Util
     sudo: yes
     sudo_user: ubuntu
+
+  - name: Reinstall nullarbor to get the head version.
+    command: brew reinstall nullarbor --HEAD
